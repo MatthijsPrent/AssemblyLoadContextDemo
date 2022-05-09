@@ -21,7 +21,6 @@ module main =
     type Msg = 
     | LoadAssembly
     | UnloadAssembly
-    | LoadAndUnload
     | CollectGarbage
 
     let update msg m =
@@ -37,16 +36,6 @@ module main =
             
             { m with result = "isalive: " + m.Weakref.Value.IsAlive.ToString()
                      HostassLoadCont = None}
-        | LoadAndUnload -> 
-            let result = loadAndUnload()
-            [1 .. 10]
-            |> List.iter (fun _ -> 
-                if result.Value.IsAlive then
-                    GC.Collect()
-                    GC.WaitForPendingFinalizers()
-                else
-                    ())
-            {m with result = "isalive: " + result.Value.IsAlive.ToString()}
         | CollectGarbage -> 
             collectGarbage m.Weakref
             { m with result = "alive: " + m.Weakref.Value.IsAlive.ToString()}
@@ -57,7 +46,6 @@ module main =
         [
             "Load" |> Binding.cmd LoadAssembly
             "Unload" |> Binding.cmd UnloadAssembly
-            "LoadAndUnload" |> Binding.cmd LoadAndUnload
             "result" |> Binding.oneWay (fun m -> m.result)
             "CollectGarbage" |>  Binding.cmd CollectGarbage
         ]
